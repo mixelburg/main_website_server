@@ -25,9 +25,7 @@ async function connectDB() {
         // initialize Express
         const app = Express()
 
-        app.use(cors({
-            origin: '*'
-        }));
+        app.use(cors());
 
         app.use(Express.static(path.join(__dirname, 'build')));
 
