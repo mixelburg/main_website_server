@@ -1,0 +1,4 @@
+{
+  "db_uri": "mongodb+srv://admin:EEE7shuknmsC11yl@cluster0.hpsqn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+  "listen_port": 5000
+}
