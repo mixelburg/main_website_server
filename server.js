@@ -1,8 +1,14 @@
+const fs = require('fs');
 const { MongoClient } = require("mongodb")
 const Express = require("express")
 const path = require("path")
 const config = require("./config.json")
 const cors = require('cors');
+const https = require('https');
+
+const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
+const credentials = {key: privateKey, cert: certificate};
 
 const uri = config["db_uri"]
 const port = config["listen_port"]
@@ -40,10 +46,8 @@ async function connectDB() {
             })
         });
 
-        // start the server
-        app.listen(port, () => {
-            console.log(`[+] listening on port ${port}`)
-        })
+        const httpsServer = https.createServer(credentials, app);
+        httpsServer.listen(port)
 
 
     } catch (e) {
