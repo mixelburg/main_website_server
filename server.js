@@ -13,6 +13,7 @@ const credentials = {key: privateKey, cert: certificate};
 const uri = config["db_uri"]
 const port = config["listen_port"]
 
+
 async function getData(collection) {
     let result = await collection.find()
 
@@ -46,9 +47,13 @@ async function connectDB() {
             })
         });
 
+        app.get('/projects/:project_id/photos/:photo', function (req, res) {
+            res.sendFile(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
+        })
+
+
         const httpsServer = https.createServer(credentials, app);
         httpsServer.listen(port)
-
 
     } catch (e) {
         console.log(e)
