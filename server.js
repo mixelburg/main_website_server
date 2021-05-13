@@ -48,7 +48,9 @@ async function connectDB() {
         });
 
         app.get('/projects/:project_id/photos/:photo', function (req, res) {
-            res.sendFile(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
+            console.log(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
+            res.send(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
+            //dres.sendFile(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
         })
 
 
