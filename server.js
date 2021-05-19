@@ -26,6 +26,7 @@ async function connectDB() {
         // connect the database
         await client.connect()
         const projects = client.db("main").collection("projects")
+        const aboutme = client.db("main").collection("about")
 
         console.log("[+] DB connected")
 
@@ -50,6 +51,12 @@ async function connectDB() {
         app.get('/projects/:project_id/photos/:photo', function (req, res) {
             res.sendFile(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
         })
+
+        app.get('/about', function(req, res){
+            getData(aboutme).then(data => {
+                res.send(JSON.stringify(data))
+            })
+        });
 
 
         const httpsServer = https.createServer(credentials, app);
