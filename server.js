@@ -26,7 +26,8 @@ async function connectDB() {
         // connect the database
         await client.connect()
         const projects = client.db("main").collection("projects")
-        const aboutme = client.db("main").collection("about")
+        const about_exp = client.db("main").collection("about_exp")
+        const about_edu = client.db("main").collection("about_edu")
 
         console.log("[+] DB connected")
 
@@ -53,8 +54,15 @@ async function connectDB() {
         })
 
         app.get('/about', function(req, res){
-            getData(aboutme).then(data => {
-                res.send(JSON.stringify(data))
+            getData(about_exp).then(exp_data => {
+                getData(about_edu).then(edu_data => {
+                    res.send(JSON.stringify(
+                        {
+                            experience: exp_data,
+                            education: edu_data
+                        }
+                    ))
+                })
             })
         });
 
