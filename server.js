@@ -6,6 +6,7 @@ const config = require("./config.json")
 const cors = require('cors');
 const https = require('https');
 const fetch = require('node-fetch');
+const bodyParser = require('body-parser')
 
 const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
@@ -37,12 +38,16 @@ async function connectDB() {
 
         app.use(cors());
 
+        // parse application/json
+        app.use(bodyParser.json());
+        // parse application/x-www-form-urlencoded
+        app.use(bodyParser.urlencoded({ extended: true }));
+
         app.use(Express.static(path.join(__dirname, 'build')));
 
         app.get('/', function (req, res) {
             res.sendFile(path.join(__dirname, 'build', 'index.html'));
         });
-
 
         app.get('/projects', function(req, res){
             getData(projects).then(data => {

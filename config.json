@@ -1,4 +1,5 @@
 {
   "db_uri": "mongodb+srv://admin:EEE7shuknmsC11yl@cluster0.hpsqn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-  "listen_port": 5000
+  "listen_port": 5000,
+  "SECRET_KEY": "6LcIBuQaAAAAAKKVRXn6uvUTfu8NfQVEyJrx8qEz"
 }
