@@ -12,9 +12,9 @@ const uri = config["db_uri"]
 const port = config["listen_port"]
 const SECRET_KEY = config["SECRET_KEY"];
 
-const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
-const credentials = {key: privateKey, cert: certificate};
+// const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey.pem', 'utf8');
+// const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
+// const credentials = {key: privateKey, cert: certificate};
 
 async function getData(collection) {
     let result = await collection.find()
@@ -80,10 +80,10 @@ async function connectDB() {
                 .then(json => res.send(json));
         });
 
-        //app.listen(port)
+        app.listen(port)
 
-        const httpsServer = https.createServer(credentials, app);
-        httpsServer.listen(port)
+        // const httpsServer = https.createServer(credentials, app);
+        // httpsServer.listen(port)
 
     } catch (e) {
         console.log(e)
