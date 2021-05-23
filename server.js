@@ -98,6 +98,8 @@ async function connectDB() {
                 text: `reply to: ${req.body["mail_reply"]} \n \n ${req.body["message"]}`
             };
 
+            console.log(req.body["key"])
+            console.log(config["mail_key"])
             if (req.body["key"] === config["mail_key"]) {
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
