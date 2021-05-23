@@ -101,6 +101,7 @@ async function connectDB() {
             console.log(req.body["key"])
             console.log(config["mail_key"])
             if (req.body["key"] === config["mail_key"]) {
+                console.log("[+] sending email")
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
                         console.log(error);
@@ -112,6 +113,7 @@ async function connectDB() {
                 });
             }
             else {
+                console.log("[!] invalid key")
                 res.send({res: "key invalid"})
             }
         }))
