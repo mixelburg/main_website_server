@@ -16,7 +16,9 @@ const mailOptions = {
     text: `reply to: test`
 };
 
+console.log("sending mail")
 transporter.sendMail(mailOptions, (error, info) => {
+    console.log("got response")
     if (error) {
         console.log(error);
     } else {
