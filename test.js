@@ -9,7 +9,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-
 const mailOptions = {
     from: config["mail_from"],
     to: config["mail_from"],
