@@ -1,5 +1,9 @@
 {
   "db_uri": "mongodb+srv://admin:EEE7shuknmsC11yl@cluster0.hpsqn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
   "listen_port": 5000,
-  "SECRET_KEY": "6LcIBuQaAAAAAKKVRXn6uvUTfu8NfQVEyJrx8qEz"
+  "SECRET_KEY": "6LcIBuQaAAAAAKKVRXn6uvUTfu8NfQVEyJrx8qEz",
+  "mail_user": "mixelburg.play@gmail.com",
+  "mail_pass": "mixelburgkris20",
+  "mail_from": "contact@mixelburg.com",
+  "mail_key": "gj7uoxBG4AY%Q$onN^qB"
 }

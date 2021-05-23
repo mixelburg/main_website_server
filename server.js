@@ -7,14 +7,23 @@ const cors = require('cors');
 const https = require('https');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser')
+const nodemailer = require('nodemailer')
+
+const uri = config["db_uri"]
+const port = config["listen_port"]
+const SECRET_KEY = config["SECRET_KEY"];
 
 const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
 const credentials = {key: privateKey, cert: certificate};
 
-const uri = config["db_uri"]
-const port = config["listen_port"]
-const SECRET_KEY = config["SECRET_KEY"];
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: config["mail_user"],
+        pass: config["mail_pass"]
+    }
+});
 
 async function getData(collection) {
     let result = await collection.find()
@@ -45,21 +54,21 @@ async function connectDB() {
 
         app.use(Express.static(path.join(__dirname, 'build')));
 
-        app.get('/', function (req, res) {
+        app.get('/', (req, res) => {
             res.sendFile(path.join(__dirname, 'build', 'index.html'));
         });
 
-        app.get('/projects', function(req, res){
+        app.get('/projects', (req, res) => {
             getData(projects).then(data => {
                 res.send(JSON.stringify(data))
             })
         });
 
-        app.get('/projects/:project_id/photos/:photo', function (req, res) {
-            res.sendFile(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
+        app.get('/projects/:project_id/photos/:photo', (req, res) => {
+            res.sendFile(`${__dirname}/photos/${req.parSams["project_id"]}/${req.params["photo"]}`)
         })
 
-        app.get('/about', function(req, res){
+        app.get('/about', (req, res) => {
             getData(about_exp).then(exp_data => {
                 getData(about_edu).then(edu_data => {
                     res.send(JSON.stringify(
@@ -79,6 +88,32 @@ async function connectDB() {
                 .then(res => res.json())
                 .then(json => res.send(json));
         });
+
+        app.post('/mail', ((req, res) => {
+
+            const mailOptions = {
+                from: config["mail_from"],
+                to: config["mail_from"],
+                subject: `[contact] from ${req.body["name"]}`,
+                text: `reply to: ${req.body["mail_reply"]} \n \n ${req.body["message"]}`
+            };
+
+            if (req.body["key"] === config["mail_key"]) {
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.log(error);
+                        res.send({res: "[!] error sending mail"})
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                        res.send({res: "[+] email sent"})
+                    }
+                });
+            }
+            else {
+                res.send({res: "key invalid"})
+            }
+        }))
+
 
         const httpsServer = https.createServer(credentials, app);
         httpsServer.listen(port)
