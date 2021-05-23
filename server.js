@@ -7,7 +7,6 @@ const cors = require('cors');
 const https = require('https');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser')
-const nodemailer = require('nodemailer')
 
 const uri = config["db_uri"]
 const port = config["listen_port"]
@@ -16,14 +15,6 @@ const SECRET_KEY = config["SECRET_KEY"];
 const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
 const credentials = {key: privateKey, cert: certificate};
-
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: config["mail_user"],
-        pass: config["mail_pass"]
-    }
-});
 
 async function getData(collection) {
     let result = await collection.find()
@@ -88,35 +79,6 @@ async function connectDB() {
                 .then(res => res.json())
                 .then(json => res.send(json));
         });
-
-        app.post('/mail', ((req, res) => {
-
-            const mailOptions = {
-                from: config["mail_from"],
-                to: config["mail_from"],
-                subject: `[contact] from ${req.body["name"]}`,
-                text: `reply to: ${req.body["mail_reply"]} \n \n ${req.body["message"]}`
-            };
-
-            console.log(req.body["key"])
-            console.log(config["mail_key"])
-            if (req.body["key"] === config["mail_key"]) {
-                console.log("[+] sending email")
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        console.log(error);
-                        res.send({res: "[!] error sending mail"})
-                    } else {
-                        console.log('Email sent: ' + info.response);
-                        res.send({res: "[+] email sent"})
-                    }
-                });
-            }
-            else {
-                console.log("[!] invalid key")
-                res.send({res: "key invalid"})
-            }
-        }))
 
         //app.listen(port)
 
