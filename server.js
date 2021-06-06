@@ -7,6 +7,7 @@ const cors = require('cors');
 const https = require('https');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser')
+const mail = require('./mail')
 
 const uri = config["db_uri"]
 const port = config["listen_port"]
@@ -78,6 +79,31 @@ async function connectDB() {
             return fetch(VERIFY_URL, { method: 'POST' })
                 .then(res => res.json())
                 .then(json => res.send(json));
+        });
+
+        app.post('/mail', (req, res) => {
+            console.log(req.body)
+
+            if (req.body['key'] === config["MAIL_KEY"]) {
+                const mailBody = {
+                    to: config["MAIL_TO"],
+                    from: config["MAIL_FROM"],
+                    subject: "[contact]",
+                    message: `
+                from: ${req.body['from_name']}
+                email: ${req.body['email']}
+                message:
+                ${req.body['message']}
+                `
+                }
+                mail.sendMail(mailBody)
+
+                res.send(JSON.stringify({status: "1", msg: "[+] email sent successfully"}))
+            }
+            else {
+                res.send(JSON.stringify({status: "1", msg: "[!] error sending email"}))
+            }
+
         });
 
         // app.listen(port)
