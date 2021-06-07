@@ -2,12 +2,11 @@ const fs = require('fs');
 const { MongoClient } = require("mongodb")
 const Express = require("express")
 const path = require("path")
-const config = require("./config.json")
+const config = require("./secret/config.json")
 const cors = require('cors');
 const https = require('https');
-const fetch = require('node-fetch');
 const bodyParser = require('body-parser')
-const mail = require('./mail')
+const handlers = require('./handlers')
 
 const uri = config["db_uri"]
 const port = config["listen_port"]
@@ -17,10 +16,14 @@ const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey
 const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
 const credentials = {key: privateKey, cert: certificate};
 
-async function getData(collection) {
-    let result = await collection.find()
+const errorCatcher = (callback) => {
+    try {
+        callback()
+    } catch (e) {
+        console.log(`[!!] error in ${callback.name}`)
+        console.log(e)
+    }
 
-    return await result.toArray()
 }
 
 async function connectDB() {
@@ -46,64 +49,38 @@ async function connectDB() {
 
         app.use(Express.static(path.join(__dirname, 'build')));
 
-        app.get('/', (req, res) => {
-            res.sendFile(path.join(__dirname, 'build', 'index.html'));
-        });
-
         app.get('/projects', (req, res) => {
-            getData(projects).then(data => {
-                res.send(JSON.stringify(data))
+            errorCatcher(() => {
+                handlers.projectsHandler(req, res, projects)
             })
         });
 
         app.get('/projects/:project_id/photos/:photo', (req, res) => {
-            res.sendFile(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
+            errorCatcher(() => {
+                handlers.photoHandler(req, res)
+            })
         })
 
         app.get('/about', (req, res) => {
-            getData(about_exp).then(exp_data => {
-                getData(about_edu).then(edu_data => {
-                    res.send(JSON.stringify(
-                        {
-                            experience: exp_data,
-                            education: edu_data
-                        }
-                    ))
-                })
+            errorCatcher(() => {
+                handlers.aboutHandler(req, res, about_exp, about_edu)
             })
         });
 
         // verify reCAPTCHA response
         app.post('/verify', (req, res) => {
-            const VERIFY_URL = `https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=${req.body['g-recaptcha-response']}`;
-            return fetch(VERIFY_URL, { method: 'POST' })
-                .then(res => res.json())
-                .then(json => res.send(json));
+            errorCatcher(() => {
+                handlers.verifyHandler(req, res, SECRET_KEY)
+            })
         });
 
         app.post('/mail', (req, res) => {
-            console.log(req.body)
-
-            if (req.body['key'] === config["MAIL_KEY"]) {
-                const mailBody = {
-                    to: config["MAIL_TO"],
-                    from: config["MAIL_FROM"],
-                    subject: "[contact]",
-                    message: `
-                from: ${req.body['from_name']}
-                email: ${req.body['email']}
-                message:
-                ${req.body['message']}
-                `
-                }
-                mail.sendMail(mailBody)
-
-                res.send(JSON.stringify({status: "1", msg: "[+] email sent successfully"}))
-            }
-            else {
-                res.send(JSON.stringify({status: "1", msg: "[!] error sending email"}))
-            }
-
+            errorCatcher(() => {
+                handlers.mailHandler(
+                    req, res,
+                    config['MAIL_KEY'], config['MAIL_TO'], config['MAIL_FROM']
+                )
+            })
         });
 
         // app.listen(port)

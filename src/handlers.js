@@ -1,3 +1,6 @@
+const mail = require("./mail");
+
+
 async function getData(collection) {
     let result = await collection.find()
 
@@ -65,5 +68,5 @@ module.exports = {
     photoHandler,
     aboutHandler,
     verifyHandler,
-
+    mailHandler
 }

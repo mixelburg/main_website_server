@@ -1,6 +1,6 @@
 # Project exclude paths
 /node_modules/
 
-config.json
-credentials.json
-token.json
+src/secret/config.json
+src/secret/credentials.json
+src/secret/token.json
