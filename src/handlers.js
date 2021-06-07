@@ -1,5 +1,5 @@
 const mail = require("./mail");
-
+const fetch = require("node-fetch")
 
 async function getData(collection) {
     let result = await collection.find()
