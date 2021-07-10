@@ -40,6 +40,8 @@ async function connectDB() {
         // initialize Express
         const app = Express()
 
+        app.use('/files', Express.static('files'))
+
         app.use(cors());
 
         // parse application/json
@@ -82,8 +84,6 @@ async function connectDB() {
                 )
             })
         });
-
-        // app.listen(port)
 
         const httpsServer = https.createServer(credentials, app);
         httpsServer.listen(port)
