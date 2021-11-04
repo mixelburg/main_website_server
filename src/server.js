@@ -14,9 +14,9 @@ const uri = config["db_uri"]
 const port = config["listen_port"]
 const SECRET_KEY = config["SECRET_KEY"];
 
-// const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey.pem', 'utf8');
-// const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
-// const credentials = {key: privateKey, cert: certificate};
+const privateKey  = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/mixelburg.com/fullchain.pem', 'utf8');
+const credentials = {key: privateKey, cert: certificate};
 
 async function connectDB() {
     const client = new MongoClient(uri, { useUnifiedTopology: true })
@@ -70,12 +70,12 @@ async function connectDB() {
 
         app.use(ErrorHandler)
 
-        // const httpsServer = https.createServer(credentials, app);
-        // httpsServer.listen(port)
+        const httpsServer = https.createServer(credentials, app);
+        httpsServer.listen(port)
 
-        app.listen(port, () => {
-            console.log(`Example app listening at http://localhost:${port}`)
-        })
+        // app.listen(port, () => {
+        //     console.log(`Example app listening at http://localhost:${port}`)
+        // })
 
     } catch (e) {
         console.log(e)
