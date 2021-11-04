@@ -2,43 +2,40 @@ const mail = require("./mail");
 const fetch = require("node-fetch")
 
 async function getData(collection) {
-    let result = await collection.find()
-
-    return await result.toArray()
+    return await (await collection.find()).toArray()
 }
 
-const projectsHandler = (req, res, projects) => {
-    getData(projects).then(data => {
-        res.send(JSON.stringify(data))
-    })
+async function getSortedData(collection) {
+    return await (await collection.find().sort({ date : 1 })).toArray()
+}
+
+const projectsHandler = async (req, res, projects) => {
+    const data = await getData(projects)
+    res.send(JSON.stringify(data))
 }
 
 const photoHandler = (req, res) => {
     res.sendFile(`${__dirname}/photos/${req.params["project_id"]}/${req.params["photo"]}`)
 }
 
-const aboutHandler = (req, res, about_exp, about_edu) => {
-    getData(about_exp).then(exp_data => {
-        getData(about_edu).then(edu_data => {
-            res.send(JSON.stringify(
-                {
-                    experience: exp_data,
-                    education: edu_data
-                }
-            ))
-        })
-    })
+const aboutHandler = async (req, res, about_exp, about_edu) => {
+    res.send(JSON.stringify(
+        {
+            experience: await getSortedData(about_exp),
+            education: await getSortedData(about_edu)
+        }
+    ))
 }
 
-const verifyHandler = (req, res, SECRET_KEY) => {
+const verifyHandler = async (req, res, SECRET_KEY) => {
     const VERIFY_URL =
         `https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=${req.body['g-recaptcha-response']}`;
-    return fetch(VERIFY_URL, { method: 'POST' })
-        .then(res => res.json())
-        .then(json => res.send(json));
+    const api_res = await fetch(VERIFY_URL, { method: 'POST' })
+    const json = await api_res.json()
+    res.send(json)
 }
 
-const mailHandler = (req, res, key, mail_to, mail_from) => {
+const mailHandler = async (req, res, key, mail_to, mail_from) => {
     console.log(req.body)
 
     if (req.body['key'] === key) {
